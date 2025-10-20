@@ -39,12 +39,35 @@ X = df.drop('PhoneType', axis=1)
 y = df['PhoneType']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Перебор k от 1 до 10 и оценка точности
+k_range = range(1, 11)
+accuracies = []
+
+for k in k_range:
+    knn = KNeighborsClassifier(n_neighbors=k)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    knn.fit(X_train, y_train)
+    score = knn.score(X_test, y_test)
+    accuracies.append(score)
+
+# построение графика для определения самого подходящего k
+plt.figure(figsize=(8, 5))
+sns.lineplot(x=k_range, y=accuracies, marker='o')
+plt.title('Точность модели при разных k')
+plt.xlabel('k (число соседей)')
+plt.ylabel('Точность')
+plt.xticks(k_range)
+plt.grid(True)
+plt.show()
+
 # ввод значения k
 while True:
     try:
-        k = int(input("Введите количество соседей (k): "))
+        k = int(input("Введите нечетное число соседей (k): "))
         if k <= 0:
             print("Пожалуйста, введите положительное число.")
+        elif k % 2 == 0:
+            print("Пожалуйста, введите нечетное число.")
         else:
             break
     except ValueError:
