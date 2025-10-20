@@ -1,6 +1,10 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.manifold import TSNE
 
 # загружаем датасет из папки, в которой находится скрипт
 df = pd.read_csv('practice_1.csv', delimiter=';')
@@ -35,8 +39,19 @@ X = df.drop('PhoneType', axis=1)
 y = df['PhoneType']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# ввод значения k
+while True:
+    try:
+        k = int(input("Введите количество соседей (k): "))
+        if k <= 0:
+            print("Пожалуйста, введите положительное число.")
+        else:
+            break
+    except ValueError:
+        print("Пожалуйста, введите корректное числовое значение.")
+
 # обучение модели
-knn = KNeighborsClassifier(n_neighbors=5)
+knn = KNeighborsClassifier(n_neighbors=k)
 knn.fit(X_train, y_train)
 
 print("Пожалуйста, ответьте на следующие вопросы:")
@@ -68,3 +83,30 @@ elif prediction[0] == 2:
     print("\033[1mПредположительный телефон: Андроид\033[0m")
 else:
     print("\033[1mНеизвестное предсказание\033[0m")
+
+# визуализация с помощью t-SNE
+tsne = TSNE(n_components=2, perplexity=30, max_iter=1000, random_state=42)
+X_tsne = tsne.fit_transform(X)
+
+plt.figure(figsize=(10, 6))
+scatter = sns.scatterplot(
+    x=X_tsne[:, 0],
+    y=X_tsne[:, 1],
+    hue=y,
+    palette={1: 'blue', 2: 'orange'},
+    s=60
+)
+
+# добавляем легенду
+legend_handles = [
+    mpatches.Patch(color='blue', label='Айфон'),
+    mpatches.Patch(color='orange', label='Андроид')
+]
+plt.legend(handles=legend_handles, title='Тип телефона')
+
+plt.title('2D Визуализация данных (t-SNE)')
+plt.xlabel('t-SNE 1')
+plt.ylabel('t-SNE 2')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
