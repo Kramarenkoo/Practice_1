@@ -66,8 +66,6 @@ while True:
         k = int(input("Введите нечетное число соседей (k): "))
         if k <= 0:
             print("Пожалуйста, введите положительное число.")
-        elif k % 2 == 0:
-            print("Пожалуйста, введите нечетное число.")
         else:
             break
     except ValueError:
